@@ -36,6 +36,6 @@ Opciones: `--video` (por defecto `videos/store.mp4`), `--salida`, `--linea-y`, `
 - **Detección y seguimiento:** `model.track(..., classes=[0], tracker="bytetrack.yaml")` devuelve cada persona con un ID estable entre cuadros.
 - **Filtro de falsos positivos:** un ID cuenta como persona solo después de moverse 60 píxeles. Así se descartan objetos fijos que YOLO confunde con personas (por ejemplo un cartel).
 - **Estela:** se guardan los últimos 45 cuadros de cada ID y los trazos más viejos se dibujan más transparentes.
-- **Mapa de calor:** cada centro suma 1 en una grilla 4 veces más pequeña que el video. Se difumina, se colorea y se superpone.
+- **Mapa de calor:** cada centro suma 1 en una grilla 4 veces más pequeña que el video. Se difumina, se pasa a escala logarítmica (para que una zona muy transitada no oculte el resto del recorrido), se colorea y se superpone.
 - **Contador:** la línea tiene una zona muerta de 12 píxeles. Un cruce de arriba hacia abajo es una entrada y de abajo hacia arriba es una salida.
 - **Compresión:** al terminar, el video se re-codifica a H.264 para que pese unos 30 MB.

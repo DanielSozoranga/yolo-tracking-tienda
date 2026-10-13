@@ -5,3 +5,4 @@ __pycache__/
 *.pt
 .ipynb_checkpoints/
 .vscode/
+salidas/calor.npy

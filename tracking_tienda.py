@@ -84,11 +84,14 @@ def sumar_calor(calor, cx, cy):
 
 def crear_capa_calor(calor, tamano):
     """Convierte la grilla acumulada en (imagen de color, opacidad) del tamano del video."""
-    suave = cv2.GaussianBlur(calor, (0, 0), 4)        # difumina las celdas
-    norm = suave / max(float(suave.max()), 1e-6)      # 0 a 1
+    suave = cv2.GaussianBlur(calor, (0, 0), 3.5)      # difumina las celdas
+    positivos = suave[suave > 0]
+    tope = np.percentile(positivos, 99) if positivos.size else 1.0
+    # escala logaritmica: una zona muy caliente no apaga al resto del recorrido
+    norm = np.clip(np.log1p(suave) / np.log1p(max(tope, 1e-6)), 0, 1)
     norm = cv2.resize(norm, tamano, interpolation=cv2.INTER_LINEAR)
     color = cv2.applyColorMap((norm * 255).astype(np.uint8), cv2.COLORMAP_JET)
-    alfa = (np.sqrt(norm) * ALFA_CALOR)[..., None]    # zonas frias casi transparentes
+    alfa = (norm * ALFA_CALOR)[..., None]             # zonas frias casi transparentes
     return color.astype(np.float32), alfa.astype(np.float32)
 
 
@@ -184,6 +187,7 @@ def main():
             print(f"frame {n}/{total}  entradas={len(entradas)} salidas={len(salidas)}", flush=True)
 
     escritor.release()
+    np.save(Path(args.salida).with_name("calor.npy"), calor)
     comprimir(temporal, args.salida)
     Path(temporal).unlink()
     if fondo is not None:
